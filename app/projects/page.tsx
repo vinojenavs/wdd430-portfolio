@@ -1,7 +1,31 @@
-export default function Projects() {
-    return (
-        <section>
-            <h1 className="text-4xl font-bold mb-4">Projects Overview</h1>
-        </section>
-    )
+"use cache";
+import type { Project } from '@/lib/projects-db';
+import ProjectCard from '@/components/ProjectCard';
+
+async function getProjects(): Promise<Project[]> {
+  const response = await fetch('http://localhost:3000/api/projects', {
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch projects');
+  }
+
+  return (await response.json()) as Project[];
+}
+
+export default async function ProjectsPage() {
+  const projects = await getProjects();
+
+  return (
+    <section>
+      <h1 className="mb-6 text-3xl font-bold">All Projects</h1>
+
+      <div className="grid gap-6 sm:grid-cols-2">
+        {projects.map((project) => (
+          <ProjectCard key={project.id} {...project} />
+        ))}
+      </div>
+    </section>
+  );
 }
