@@ -1,22 +1,9 @@
 "use cache";
-import type { Project } from '@/lib/projects-db';
+import { getProjects } from '@/lib/projects-db';
 import ProjectCard from '@/components/ProjectCard';
 
-async function getProjects(): Promise<Project[]> {
-  const response = await fetch(
-    'http://localhost:3000/api/projects?type=school',
-    { cache: 'no-store' }
-  );
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch school projects');
-  }
-
-  return (await response.json()) as Project[];
-}
-
 export default async function SchoolProjectsPage() {
-  const projects = await getProjects();
+  const projects = await getProjects('school');
 
   return (
     <section>
