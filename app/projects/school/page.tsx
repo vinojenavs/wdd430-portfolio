@@ -1,21 +1,14 @@
-"use cache";
-import { getProjects } from '@/lib/projects-db';
-import ProjectCard from '@/components/ProjectCard';
+import { Suspense } from "react";
+import SchoolProjectsList from "@/components/SchoolProjects";
+import SchoolProjectSkeleton from "@/components/SchoolProjectSkeleton";
 
 export default async function SchoolProjectsPage() {
-  const projects = await getProjects('school');
-
   return (
     <section>
-      <h1 className="mb-6 text-3xl font-bold">
-        School Projects
-      </h1>
-
-      <div className="grid gap-6 sm:grid-cols-2">
-        {projects.map((project) => (
-          <ProjectCard key={project.id} {...project} />
-        ))}
-      </div>
+      <h1 className="mb-6 text-3xl font-bold">School Projects</h1>
+      <Suspense fallback={<SchoolProjectSkeleton />}>
+        <SchoolProjectsList />
+      </Suspense>
     </section>
-  );
+  )
 }

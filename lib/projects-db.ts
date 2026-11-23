@@ -9,6 +9,35 @@ export interface Project {
     link?: string;
 }
 
+export const ITEMS_PER_PAGE = 6;
+
+export async function fetchFilteredProjects(query: string, currentPage: number): Promise<Project[]> {
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+    const searchTerm = `%${query.trim()}%`;
+    const { rows } = await sql<Project>`
+    SELECT * FROM projects 
+    WHERE title ILIKE ${searchTerm} 
+    OR description ILIKE ${searchTerm}
+    OR array_to_string(technologies, '') ILIKE ${searchTerm}
+    ORDER BY id
+    LIMIT ${ITEMS_PER_PAGE}
+    OFFSET ${offset}
+    `;
+    return rows;
+}
+
+export async function fetchProjectsPages(query: string): Promise<number> {
+    const searchTerm = `%${query.trim()}%`;
+    const { rows } = await sql<{ count: string }>`
+    SELECT COUNT(*) AS count FROM projects 
+    WHERE title ILIKE ${searchTerm}
+    OR description ILIKE ${searchTerm}
+    OR array_to_string(technologies, '') ILIKE ${searchTerm}
+    `;
+    const totalProjects = Number(rows[0].count);
+    return Math.ceil(totalProjects / ITEMS_PER_PAGE);
+}
+
 export async function getProjects(type?: string | null): Promise<Project[]> {
     if (type) {
         const { rows } = await sql<Project> `
