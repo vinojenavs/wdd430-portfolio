@@ -1,4 +1,5 @@
 
+import { deleteProject } from '@/lib/actions';
 import { Suspense } from 'react';
 import {
   fetchFilteredProjects,
@@ -7,6 +8,7 @@ import {
 import ProjectCard from '@/components/ProjectCard';
 import ProjectSearch from '@/components/ProjectSearch';
 import Pagination from '@/components/Pagination';
+import Link from 'next/link';
 
 interface ProjectsPageProps {
   searchParams: Promise<{
@@ -23,14 +25,17 @@ export default function ProjectsPage({
       <h1 className="mb-6 text-3xl font-bold">
         All Projects
       </h1>
-
-      <Suspense fallback={<p>Loading search...</p>}>
+      <Suspense fallback={<input
+        disabled
+        placeholder="Loading search..."
+        className="w-full rounded-lg border border-gray-300 px-4 py-3"
+      />}>
         <ProjectSearch />
-      </Suspense>
-
+      </Suspense> 
       <Suspense fallback={<p>Loading projects...</p>}>
         <ProjectContent searchParams={searchParams} />
       </Suspense>
+      <Link href="/projects/create" className="inline-block rounded-lg bg-blue-500 my-2 px-4 py-3 text-white hover:bg-blue-600">Create Project</Link>
     </section>
   );
 }
@@ -52,9 +57,19 @@ async function ProjectContent({
 
   return (
     <>
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-6 my-5 sm:grid-cols-2">
         {projects.map((project) => (
-          <ProjectCard key={project.id} {...project} />
+          <div key={project.id}>
+            <ProjectCard {...project} />
+            <Link href={`/projects/${project.id}/edit`} className="mt-3 inline-block rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+              Edit Project
+            </Link>
+            <form action={deleteProject.bind(null, String(project.id))}>
+              <button type="submit" className="mt-3 inline-block rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600">
+                Delete Project
+              </button>
+            </form>
+          </div>
         ))}
       </div>
 

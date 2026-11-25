@@ -1,3 +1,4 @@
+"use cache";
 import { sql } from "@vercel/postgres";
 
 export interface Project {
